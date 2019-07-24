@@ -1,0 +1,7 @@
+{
+  "name": "web-deneme-8",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}
