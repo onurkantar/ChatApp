@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { ScreenService } from '../services/screen.service';
+import { ScreenService } from '../Screen/screen.service';
 
 export interface Message {
 
@@ -17,6 +17,7 @@ export interface Message {
 export class StorageService {
 
   messages: Message[] = [];
+  unsent: Message[] = [];
 
   constructor(
     private storage: Storage,
@@ -35,6 +36,9 @@ export class StorageService {
 
           for (const message of msg) {
             this.messages.push(message);
+            if (message.key === null) {
+              this.unsent.push(message);
+            }
           }
           console.log('init messages : ');
           console.log(this.messages);
@@ -44,6 +48,10 @@ export class StorageService {
 
     });
 
+  }
+
+  getUnsentMessages() {
+    return this.unsent;
   }
 
   store(message: Message) {

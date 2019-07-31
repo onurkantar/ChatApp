@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SocketIo } from 'ng-io';
-import { NavigationService } from '../services/navigation.service';
-import { ScreenService } from '../services/screen.service';
-import { StorageService, Message } from '../services/storage.service';
-import { HttpService } from '../services/http.service';
+import { NavigationService } from '../services/Navigation/navigation.service';
+import { ScreenService } from '../services/Screen/screen.service';
+import { StorageService, Message } from '../services/Storage/storage.service';
+import { HttpService } from '../services/HTTP/http.service';
 
 @Component({
   selector: 'app-chat-room-page',
@@ -16,10 +16,11 @@ export class ChatRoomPagePage implements OnInit {
   messages: Message[] = []; // done
   nickname = '';
   message = '';
+  autoSync = false;
 
   ngOnInit() {
-    this.nickname = this.navCtrl.get('nickname');
     this.messages = this.storage.getMessages();
+
   }
 
   showToast(arg0: string) {
@@ -33,6 +34,11 @@ export class ChatRoomPagePage implements OnInit {
     private storage: StorageService,
     private http: HttpService
   ) {
+
+    this.nickname = this.navCtrl.getNickname();
+    this.autoSync = this.navCtrl.getAuto();
+    console.log('auto sync : ' + this.autoSync);
+    console.log('nickname : ' + this.nickname);
 
     this.getMessages().subscribe((message: Message) => {
       if (message.sender !== this.nickname) {

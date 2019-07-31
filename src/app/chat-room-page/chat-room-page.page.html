@@ -31,6 +31,7 @@
         <ion-col col-3>
           <ion-button style="margin-top: 10%"  expand="block" (click)="sendMessage()" [disabled]="message === ''">Send</ion-button>
           <ion-button style="margin-top: 10%"  expand="block" (click)="clear()" [disabled]="messages.length === 0">Clear Storage</ion-button>
+          <ion-button style="margin-top: 10%"  expand="block" *ngIf="autoSync === false" >Sync</ion-button>
         </ion-col>
       </ion-row>
     </ion-toolbar>

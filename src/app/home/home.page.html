@@ -7,4 +7,11 @@
 
 
   <ion-button style="margin-top: 10%" expand="block" (click)="joinChat()" fill="outline">Join Chat as {{ nickname }}</ion-button>
+
+
+  <ion-item>
+      <ion-label>Auto Sync</ion-label>
+      <ion-checkbox [(ngModel)]="auto"></ion-checkbox>
+    </ion-item>
+
 </ion-content>

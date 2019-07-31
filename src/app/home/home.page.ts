@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavigationService } from '../services/navigation.service';
+import { NavigationService } from '../services/Navigation/navigation.service';
 import { SocketIo } from 'ng-io';
 
 
@@ -11,7 +11,7 @@ import { SocketIo } from 'ng-io';
 export class HomePage {
 
   nickname = '';
-
+  auto: false;
 
   constructor(private navCtrl: NavigationService, private socket: SocketIo) {
 
@@ -21,7 +21,15 @@ export class HomePage {
   joinChat() {
     this.socket.connect();
     this.socket.emit('set-nickname', { nickname: this.nickname });
-    this.navCtrl.push('chat-room-page', { nickname: this.nickname });
+    this.navCtrl.setNickname(this.nickname);
+    this.navCtrl.setAuto(this.auto);
+    this.navCtrl.goPage('chat-room-page');
+  }
+
+  updateAutoSync() {
+
+
+
   }
 
 }
