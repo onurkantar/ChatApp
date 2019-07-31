@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, ToastController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { SocketIo } from 'ng-io';
-import { Storage } from "@ionic/storage";
+import { NavigationService } from '../services/navigation.service';
+import { ScreenService } from '../services/screen.service';
+import { StorageService, Message } from '../services/storage.service';
+import { HttpService } from '../services/http.service';
 
 @Component({
   selector: 'app-chat-room-page',
@@ -10,73 +12,91 @@ import { Storage } from "@ionic/storage";
   styleUrls: ['./chat-room-page.page.scss'],
 })
 export class ChatRoomPagePage implements OnInit {
-  showToast(arg0: string) {
-    throw new Error("Method not implemented.");
-  }
 
-  
-  messages = [];
-  nickname:any;
+  messages: Message[] = []; // done
+  nickname = '';
   message = '';
 
-  constructor(private navCtrl: NavController, private storage: Storage, private socket: SocketIo, private toastCtrl: ToastController) {
-    this.nickname = this.storage.get('nickname');
+  ngOnInit() {
+    this.nickname = this.navCtrl.get('nickname');
+    this.messages = this.storage.getMessages();
+  }
 
-    this.getMessages().subscribe(message => {
-      this.messages.push(message);
-      //console.log(message);
-    });
+  showToast(arg0: string) {
+    throw new Error('Method not implemented.');
+  }
 
-    this.getUsers().subscribe(data => {
-      let user = data['user'];
-      if (data['event'] === 'left') {
-        this.showToast('User left: ' + user);
-      } else {
-        this.showToast('User joined: ' + user);
+  constructor(
+    private navCtrl: NavigationService,
+    private socket: SocketIo,
+    private screen: ScreenService,
+    private storage: StorageService,
+    private http: HttpService
+  ) {
+
+    this.getMessages().subscribe((message: Message) => {
+      if (message.sender !== this.nickname) {
+        this.messages.push(message);
       }
     });
 
-   }
-
-
-   sendMessage() {
-    this.socket.emit('add-message', { text: this.message });
-    this.message = '';
   }
 
 
-  getUsers() {
-    let observable = new Observable(observer => {
-      this.socket.on('users-changed', (data) => {
-        observer.next(data);
-      });
+  async sendMessage() {
+
+    const date = Date.now();
+
+    const dummyMessage: Message = {
+
+      key: null,
+      message: this.message,
+      sender: this.nickname,
+      published: date
+
+    };
+
+    this.http.getKey().then((key) => {
+
+      dummyMessage.key = key;
+
+      this.socket.emit('add-message', dummyMessage);
+
+      console.log('message sent!');
+      console.log(dummyMessage);
+
+    }).catch(error => {
+
+      this.screen.presentToast('Local Storage is Being Used!');
+
+    }).finally(() => {
+
+      this.message = '';
+      this.storage.store(dummyMessage);
+
     });
-    return observable;
+
+
   }
 
   ionViewWillLeave() {
     this.socket.disconnect();
   }
 
-  async presentToast(msg) {
-    const toast = await this.toastCtrl.create({
-      message: msg,
-      duration: 2000
-    });
-    toast.present();
-  }
-  
   getMessages() {
-    let observable = new Observable(observer => {
+    const observable = new Observable(observer => {
       this.socket.on('message', (data) => {
-        //console.log(data);
+
         observer.next(data);
       });
-    })
+    });
     return observable;
   }
 
-  ngOnInit() {
+  clear() {
+
+    this.storage.clearStorage();
+
   }
 
 }

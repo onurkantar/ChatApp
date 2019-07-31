@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { NavController } from '@ionic/angular';
-import { Storage } from "@ionic/storage";
-import {SocketIo} from 'ng-io'
+import { NavigationService } from '../services/navigation.service';
+import { SocketIo } from 'ng-io';
 
 
 @Component({
@@ -12,18 +11,17 @@ import {SocketIo} from 'ng-io'
 export class HomePage {
 
   nickname = '';
-  
 
-  constructor(private navCtrl:NavController,private socket:SocketIo,private storage:Storage) {
-    
+
+  constructor(private navCtrl: NavigationService, private socket: SocketIo) {
+
 
   }
 
   joinChat() {
-    this.storage.set('nickname',this.nickname);
     this.socket.connect();
-    this.socket.emit('set-nickname', {nickname: this.nickname});
-    this.navCtrl.navigateForward('/chat-room-page');
+    this.socket.emit('set-nickname', { nickname: this.nickname });
+    this.navCtrl.push('chat-room-page', { nickname: this.nickname });
   }
 
 }

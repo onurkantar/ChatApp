@@ -9,13 +9,19 @@
 }
 .my_message {
 
-    background: #dcdcdc !important;
+    background: #0652cb !important;
     color: #000 !important;
 }
 .other_message {
     background: #dcdcdc !important;
     color: #000 !important;
 }
+
+.unsent_message {
+    background: #7fe5f0 !important;
+    color: #000 !important;
+}
+
 .time {
     color: #afafaf;
     float: right;

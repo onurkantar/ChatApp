@@ -1,20 +1,17 @@
 import * as tslib_1 from "tslib";
 import { Component } from '@angular/core';
-import { NavController } from '@ionic/angular';
-import { Storage } from "@ionic/storage";
+import { NavigationService } from '../services/navigation.service';
 import { SocketIo } from 'ng-io';
 var HomePage = /** @class */ (function () {
-    function HomePage(navCtrl, socket, storage) {
+    function HomePage(navCtrl, socket) {
         this.navCtrl = navCtrl;
         this.socket = socket;
-        this.storage = storage;
         this.nickname = '';
     }
     HomePage.prototype.joinChat = function () {
-        this.storage.set('nickname', this.nickname);
         this.socket.connect();
-        this.socket.emit('set-nickname', this.nickname);
-        this.navCtrl.navigateForward('/chat-room-page');
+        this.socket.emit('set-nickname', { nickname: this.nickname });
+        this.navCtrl.push('chat-room-page', { nickname: this.nickname });
     };
     HomePage = tslib_1.__decorate([
         Component({
@@ -22,7 +19,7 @@ var HomePage = /** @class */ (function () {
             templateUrl: 'home.page.html',
             styleUrls: ['home.page.scss'],
         }),
-        tslib_1.__metadata("design:paramtypes", [NavController, SocketIo, Storage])
+        tslib_1.__metadata("design:paramtypes", [NavigationService, SocketIo])
     ], HomePage);
     return HomePage;
 }());
