@@ -8,6 +8,7 @@ export interface Message {
   message: string;
   sender: string;
   published: number;
+  localKey: string;
 
 }
 
@@ -50,11 +51,37 @@ export class StorageService {
 
   }
 
+
   getUnsentMessages() {
-    return this.unsent;
+    const retVal: Message[] = [];
+    for (const message of this.messages) {
+      if (message.key === null) {
+
+        retVal.push(message);
+      }
+    }
+    return retVal;
+  }
+
+  replaceSentMessage(messagePass) {
+
+    this.messages[this.messages.indexOf(this.messages.find((message) => message.localKey === messagePass.localKey))] = messagePass;
+    console.log('this messages');
+    console.log(this.messages);
+  }
+
+  afterSyncSaveStorage() {
+    this.storage.set('messages', this.messages);
+    console.log('messages saved!');
+  }
+
+  setUnsentMessages(unsentMessages: Message[]) {
+    this.unsent = unsentMessages;
   }
 
   store(message: Message) {
+
+    message.localKey = generateKey();
 
     this.messages.push(message);
     this.storage.set('messages', this.messages);
@@ -80,4 +107,19 @@ export class StorageService {
 
   }
 
+}
+
+
+
+function generateKey() {
+  let result, i, j;
+  result = '';
+  for (j = 0; j < 32; j++) {
+    if (j === 8 || j === 12 || j === 16 || j === 20) {
+      result = result + '-';
+    }
+    i = Math.floor(Math.random() * 16).toString(16).toUpperCase();
+    result = result + i;
+  }
+  return result;
 }

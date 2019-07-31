@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SocketIo } from 'ng-io';
 import { NavigationService } from '../services/Navigation/navigation.service';
 import { ScreenService } from '../services/Screen/screen.service';
 import { StorageService, Message } from '../services/Storage/storage.service';
-import { HttpService } from '../services/HTTP/http.service';
+import { HttpService } from '../services/Network/HTTP/http.service';
+import { SynchronousService } from '../services/Synchronous/synchronous.service';
+import { SocketIo } from 'ng-io';
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-chat-room-page',
@@ -17,6 +19,8 @@ export class ChatRoomPagePage implements OnInit {
   nickname = '';
   message = '';
   autoSync = false;
+  offlineFlag = false;
+  source;
 
   ngOnInit() {
     this.messages = this.storage.getMessages();
@@ -29,12 +33,14 @@ export class ChatRoomPagePage implements OnInit {
 
   constructor(
     private navCtrl: NavigationService,
-    private socket: SocketIo,
     private screen: ScreenService,
     private storage: StorageService,
-    private http: HttpService
+    private http: HttpService,
+    private socket: SocketIo,
+    private sync: SynchronousService
   ) {
 
+    const source = timer(10000);
     this.nickname = this.navCtrl.getNickname();
     this.autoSync = this.navCtrl.getAuto();
     console.log('auto sync : ' + this.autoSync);
@@ -43,6 +49,20 @@ export class ChatRoomPagePage implements OnInit {
     this.getMessages().subscribe((message: Message) => {
       if (message.sender !== this.nickname) {
         this.messages.push(message);
+      }
+    });
+
+    source.subscribe(async () => {
+      console.log('offline flag : ');
+      console.log(this.offlineFlag);
+      if (this.offlineFlag) {
+
+        await this.sync.sync(this.offlineFlag).then(flag => {
+          this.offlineFlag = flag;
+
+        });
+        console.log(this.offlineFlag);
+
       }
     });
 
@@ -58,7 +78,8 @@ export class ChatRoomPagePage implements OnInit {
       key: null,
       message: this.message,
       sender: this.nickname,
-      published: date
+      published: date,
+      localKey: null
 
     };
 
@@ -73,6 +94,7 @@ export class ChatRoomPagePage implements OnInit {
 
     }).catch(error => {
 
+      this.offlineFlag = true;
       this.screen.presentToast('Local Storage is Being Used!');
 
     }).finally(() => {
@@ -102,6 +124,11 @@ export class ChatRoomPagePage implements OnInit {
   clear() {
 
     this.storage.clearStorage();
+
+  }
+
+  Synchronous() {
+    this.sync.sync(false);
 
   }
 

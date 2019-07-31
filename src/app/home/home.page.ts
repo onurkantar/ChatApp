@@ -11,7 +11,7 @@ import { SocketIo } from 'ng-io';
 export class HomePage {
 
   nickname = '';
-  auto: false;
+  auto = false;
 
   constructor(private navCtrl: NavigationService, private socket: SocketIo) {
 
@@ -24,12 +24,6 @@ export class HomePage {
     this.navCtrl.setNickname(this.nickname);
     this.navCtrl.setAuto(this.auto);
     this.navCtrl.goPage('chat-room-page');
-  }
-
-  updateAutoSync() {
-
-
-
   }
 
 }
