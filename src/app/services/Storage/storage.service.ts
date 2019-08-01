@@ -41,8 +41,6 @@ export class StorageService {
               this.unsent.push(message);
             }
           }
-          console.log('init messages : ');
-          console.log(this.messages);
 
         });
       }
@@ -66,13 +64,10 @@ export class StorageService {
   replaceSentMessage(messagePass) {
 
     this.messages[this.messages.indexOf(this.messages.find((message) => message.localKey === messagePass.localKey))] = messagePass;
-    console.log('this messages');
-    console.log(this.messages);
   }
 
   afterSyncSaveStorage() {
     this.storage.set('messages', this.messages);
-    console.log('messages saved!');
   }
 
   setUnsentMessages(unsentMessages: Message[]) {
@@ -85,9 +80,6 @@ export class StorageService {
 
     this.messages.push(message);
     this.storage.set('messages', this.messages);
-
-    console.log('message stored');
-    console.log(this.messages);
 
   }
 

@@ -46,8 +46,6 @@ export class ChatRoomPagePage implements OnInit {
 
     this.nickname = this.navCtrl.getNickname();
     this.autoSync = this.navCtrl.getAuto();
-    console.log('auto sync : ' + this.autoSync);
-    console.log('nickname : ' + this.nickname);
 
     this.getMessages().subscribe((message: Message) => {
       if (message.sender !== this.nickname) {
@@ -63,25 +61,13 @@ export class ChatRoomPagePage implements OnInit {
         if (this.storage.getUnsentMessages().length !== 0) {
 
 
-          this.sync.sync(false).then(flag => {
-
-            console.log('sync !!!');
-
-          });
+          this.sync.sync(false).then(flag => { });
 
 
         }
 
       });
     }
-
-    /* if (this.autoSync === true) {
-       this.source.subscribe(async () => {
-         console.log('offline flag :  subscribeeeee');
-         console.log(this.offlineFlag);
- 
-       });
-     }*/
   }
 
 
@@ -104,9 +90,6 @@ export class ChatRoomPagePage implements OnInit {
       dummyMessage.key = key;
 
       this.socket.emit('add-message', dummyMessage);
-
-      console.log('message sent!');
-      console.log(dummyMessage);
 
     }).catch(error => {
 

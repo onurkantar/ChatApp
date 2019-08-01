@@ -16,11 +16,8 @@ export class SynchronousService {
     private screen: ScreenService
   ) { }
 
-  async sync(flag: boolean) { // yargı fonksiyonu elleme sakın yargı dağıtır.
+  async sync(flag: boolean) {
     const unsent: Message[] = this.storage.getUnsentMessages();
-
-    console.log('unsent messages');
-    console.log(unsent);
 
     const promise = new Promise((resolve, reject) => {
 
@@ -28,7 +25,6 @@ export class SynchronousService {
         this.http.getKey().then(key => {
 
           message.key = key;
-          console.log('promise içinde key = ' + key);
           this.socket.sendMessage(message);
           this.storage.replaceSentMessage(message);
 
@@ -36,14 +32,12 @@ export class SynchronousService {
           this.screen.presentToast('Sync!');
           this.storage.afterSyncSaveStorage();
           flag = this.convertFlag(flag);
-          console.log('2');
 
         }).catch(err => {
           this.screen.presentToast('CANT CONNECT TO THE SERVER!');
         });
       }
 
-      console.log('1');
       resolve();
 
     });
@@ -60,25 +54,4 @@ export class SynchronousService {
       return !flag;
     } else { return flag; }
   }
-  /*
-    manuelSync() {
-      const unsent: Message[] = this.storage.getUnsentMessages();
-
-      console.log('unsent messages');
-      console.log(unsent);
-
-      for (const message of unsent) {
-        this.http.getKey().then(key => {
-
-          message.key = key;
-          this.socket.sendMessage(message);
-          this.storage.replaceSentMessage(message);
-
-        }).catch(err => {
-          this.screen.presentToast('CANT CONNECT TO THE SERVER!');
-        });
-      }
-
-    this.screen.presentToast('Sync!');
-    }*/
 }
