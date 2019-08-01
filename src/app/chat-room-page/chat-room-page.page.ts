@@ -6,7 +6,6 @@ import { StorageService, Message } from '../services/Storage/storage.service';
 import { HttpService } from '../services/Network/HTTP/http.service';
 import { SynchronousService } from '../services/Synchronous/synchronous.service';
 import { SocketIo } from 'ng-io';
-import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-chat-room-page',
