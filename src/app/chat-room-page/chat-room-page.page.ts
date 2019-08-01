@@ -20,10 +20,14 @@ export class ChatRoomPagePage implements OnInit {
   message = '';
   autoSync = false;
   offlineFlag = false;
-  source;
 
   ngOnInit() {
     this.messages = this.storage.getMessages();
+    if (this.autoSync === true) {
+
+      this.socket.emit('ping');
+
+    }
 
   }
 
@@ -40,7 +44,6 @@ export class ChatRoomPagePage implements OnInit {
     private sync: SynchronousService
   ) {
 
-    const source = timer(10000);
     this.nickname = this.navCtrl.getNickname();
     this.autoSync = this.navCtrl.getAuto();
     console.log('auto sync : ' + this.autoSync);
@@ -52,20 +55,33 @@ export class ChatRoomPagePage implements OnInit {
       }
     });
 
-    source.subscribe(async () => {
-      console.log('offline flag : ');
-      console.log(this.offlineFlag);
-      if (this.offlineFlag) {
 
-        await this.sync.sync(this.offlineFlag).then(flag => {
-          this.offlineFlag = flag;
+    if (this.autoSync === true) {
 
-        });
-        console.log(this.offlineFlag);
+      this.syncMessages().subscribe(() => {
 
-      }
-    });
+        if (this.storage.getUnsentMessages().length !== 0) {
 
+
+          this.sync.sync(false).then(flag => {
+
+            console.log('sync !!!');
+
+          });
+
+
+        }
+
+      });
+    }
+
+    /* if (this.autoSync === true) {
+       this.source.subscribe(async () => {
+         console.log('offline flag :  subscribeeeee');
+         console.log(this.offlineFlag);
+ 
+       });
+     }*/
   }
 
 
@@ -96,6 +112,7 @@ export class ChatRoomPagePage implements OnInit {
 
       this.offlineFlag = true;
       this.screen.presentToast('Local Storage is Being Used!');
+      this.socket.emit('ping');
 
     }).finally(() => {
 
@@ -109,6 +126,17 @@ export class ChatRoomPagePage implements OnInit {
 
   ionViewWillLeave() {
     this.socket.disconnect();
+  }
+
+  syncMessages() {
+    const observable = new Observable(observer => {
+      this.socket.on('pong', (pong) => {
+
+        observer.next(pong);
+      });
+
+    });
+    return observable;
   }
 
   getMessages() {
